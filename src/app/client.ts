@@ -15,7 +15,7 @@ class TaskMessage {
 export default class Client extends Base {
   private taskProtocols = {
     1: this.asTaskV1,
-    2: this.asTaskV2
+    2: this.asTaskV2,
   };
 
   get createTaskMessage(): (...args: any[]) => TaskMessage {
@@ -50,7 +50,7 @@ export default class Client extends Base {
       headers: {
         lang: "js",
         task: taskName,
-        id: taskId
+        id: taskId,
         /*
         'shadow': shadow,
         'eta': eta,
@@ -67,10 +67,10 @@ export default class Client extends Base {
       },
       properties: {
         correlationId: taskId,
-        replyTo: ""
+        replyTo: "",
       },
       body: [args, kwargs, {}],
-      sentEvent: null
+      sentEvent: null,
     };
 
     return message;
@@ -96,15 +96,15 @@ export default class Client extends Base {
       headers: {},
       properties: {
         correlationId: taskId,
-        replyTo: ""
+        replyTo: "",
       },
       body: {
         task: taskName,
         id: taskId,
         args: args,
-        kwargs: kwargs
+        kwargs: kwargs,
       },
-      sentEvent: null
+      sentEvent: null,
     };
 
     return message;
@@ -126,7 +126,7 @@ export default class Client extends Base {
   /**
    * get AsyncResult by task id
    * @param {string} taskId for task identification.
-   * @returns {AsyncResult} 
+   * @returns {AsyncResult}
    */
   public asyncResult(taskId: string): AsyncResult {
     return new AsyncResult(taskId, this.backend);

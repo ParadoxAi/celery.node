@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actumn/celery.node.git"
+    "url": "git@github.com:ParadoxAi/celery.node.git"
   },
   "keywords": [
     "node-celery",
@@ -57,6 +57,12 @@
   "dependencies": {
     "amqplib": "^0.8.0",
     "ioredis": "^4.28.5",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "tslib": "^1.11.1",
+    "yarn": "^1.22.19"
+  },
+  "directories": {
+    "example": "examples",
+    "test": "test"
   }
 }
