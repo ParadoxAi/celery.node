@@ -1,6 +1,6 @@
 {
   "name": "@paradoxai/celery-node",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "celery written in nodejs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ParadoxAi/celery.node.git"
+    "url": "git+https://github.com/ParadoxAi/celery.node.git"
   },
   "keywords": [
     "node-celery",
