@@ -1,6 +1,6 @@
 {
-  "name": "@paradoxai/celery-node",
-  "version": "1.0.1",
+  "name": "@paradoxai/celery.node",
+  "version": "1.0.2",
   "description": "celery written in nodejs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
