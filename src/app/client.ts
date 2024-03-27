@@ -46,6 +46,12 @@ export default class Client extends Base {
     args?: Array<any>,
     kwargs?: object
   ): TaskMessage {
+    const retry = args?.["retry"] || this.conf.TASK_PUBLISH_RETRY;
+
+    const retryPolicy =
+      args?.["retryPolicy"] || this.conf.TASK_PUBLISH_RETRY_POLICY;
+
+    console.log("retryPolicy", retryPolicy);
     const message: TaskMessage = {
       headers: {
         lang: "js",
@@ -56,7 +62,6 @@ export default class Client extends Base {
         'eta': eta,
         'expires': expires,
         'group': group_id,
-        'retries': retries,
         'timelimit': [time_limit, soft_time_limit],
         'root_id': root_id,
         'parent_id': parent_id,
@@ -64,6 +69,7 @@ export default class Client extends Base {
         'kwargsrepr': kwargsrepr,
         'origin': origin or anon_nodename()
         */
+        retries: retry,
       },
       properties: {
         correlationId: taskId,
@@ -140,9 +146,11 @@ export default class Client extends Base {
   ): AsyncResult {
     taskId = taskId || v4();
     const message = this.createTaskMessage(taskId, taskName, args, kwargs);
+    console.log("message", message);
     this.sendTaskMessage(taskName, message);
 
     const result = new AsyncResult(taskId, this.backend);
+    console.log("result", result);
     return result;
   }
 }
