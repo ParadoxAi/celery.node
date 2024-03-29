@@ -8,12 +8,26 @@ const client = celery.createClient(
 // client.conf.TASK_PROTOCOL = 1;
 
 try {
-  const result = client.sendTask("tasks.add", [(1, 2)], {
+  const result = client.sendTask("tasks.error", [(1, 2)], {
     retry: true,
+    retryPolicy: {
+      maxRetries: 3,
+      intervalStart: 0.003,
+      intervalMax: 30,
+      intervalStep: 0.001,
+    },
   });
-  result.get().then((value) => {
-    console.log(value); // Output: Promise resolved with a value
-  });
+  result
+    .get()
+    .then((value) => {
+      console.log(value); // Output: Promise resolved with a value
+    })
+    .catch((error) => {
+      console.log("error", error);
+    })
+    .finally(() => {
+      console.log("Finally");
+    });
 
   result.get().then((value) => {
     console.log(value); // Output: Promise resolved with a value

@@ -2,8 +2,8 @@
 const celery = require("../../dist");
 
 const worker = celery.createWorker(
-  "amqp://myuser:mypassword@localhost:5673",
-  "amqp://myuser:mypassword@localhost:5673"
+  "amqp://myuser:mypassword@localhost:5672",
+  "amqp://myuser:mypassword@localhost:5672"
 );
 worker.register("tasks.error", (a, b) => {
   const c = {};
