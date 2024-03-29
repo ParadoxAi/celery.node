@@ -178,7 +178,6 @@ export default class Worker extends Base {
           console.info(
             `celery.node Task ${taskName}[${taskId}] failed: [${err}]`
           );
-          this.backend.storeResult(taskId, err, "FAILURE");
           this.activeTasks.delete(taskPromise);
 
           if (retries && retryCount < retries) {
@@ -192,9 +191,12 @@ export default class Worker extends Base {
             await new Promise((resolve) => setTimeout(resolve, delayTime));
             return executeTask(); // Retry the task
           } else {
-            console.error(
-              `celery.node Task ${taskName}[${taskId}] Maximum retries (${retries}) exceeded. ${err}.`
-            );
+            this.backend.storeResult(taskId, err, "FAILURE");
+            if (retries) {
+              console.error(
+                `celery.node Task ${taskName}[${taskId}] Maximum retries (${retries}) exceeded. ${err}.`
+              );
+            }
             return null;
           }
         }
