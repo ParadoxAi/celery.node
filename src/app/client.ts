@@ -46,12 +46,22 @@ export default class Client extends Base {
     args?: Array<any>,
     kwargs?: object
   ): TaskMessage {
-    const retry = args?.["retry"] || this.conf.TASK_PUBLISH_RETRY;
+    const retry = kwargs?.["retry"] || this.conf.TASK_PUBLISH_RETRY;
+    let retryPolicy = {};
+    if (retry) {
+      retryPolicy =
+        kwargs?.["retryPolicy"] || this.conf.TASK_PUBLISH_RETRY_POLICY;
+      for (const key in this.conf.TASK_PUBLISH_RETRY_POLICY) {
+        if (
+          this.conf.TASK_PUBLISH_RETRY_POLICY.hasOwnProperty(key) &&
+          this.conf.TASK_PUBLISH_RETRY_POLICY[key] !== 0
+        ) {
+          retryPolicy[key] = this.conf.TASK_PUBLISH_RETRY_POLICY[key];
+        }
+      }
+    }
 
-    const retryPolicy =
-      args?.["retryPolicy"] || this.conf.TASK_PUBLISH_RETRY_POLICY;
-
-    console.log("retryPolicy", retryPolicy);
+    retryPolicy;
     const message: TaskMessage = {
       headers: {
         lang: "js",
@@ -69,7 +79,7 @@ export default class Client extends Base {
         'kwargsrepr': kwargsrepr,
         'origin': origin or anon_nodename()
         */
-        retries: retry,
+        retries: retry ? retryPolicy["maxRetries"] : 0,
       },
       properties: {
         correlationId: taskId,
@@ -146,11 +156,9 @@ export default class Client extends Base {
   ): AsyncResult {
     taskId = taskId || v4();
     const message = this.createTaskMessage(taskId, taskName, args, kwargs);
-    console.log("message", message);
     this.sendTaskMessage(taskName, message);
 
     const result = new AsyncResult(taskId, this.backend);
-    console.log("result", result);
     return result;
   }
 }

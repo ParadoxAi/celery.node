@@ -18,10 +18,10 @@ const DEFAULT_CELERY_CONF: CeleryConf = {
   TASK_PROTOCOL: 2,
   TASK_PUBLISH_RETRY: false,
   TASK_PUBLISH_RETRY_POLICY: {
-    max_retries: 3,
-    interval_start: 0,
-    interval_max: 1,
-    interval_step: 0,
+    maxRetries: 3,
+    intervalStart: 0,
+    intervalMax: 1,
+    intervalStep: 0.01,
   },
 };
 
