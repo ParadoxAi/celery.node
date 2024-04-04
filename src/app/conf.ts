@@ -5,6 +5,8 @@ export interface CeleryConf {
   CELERY_BACKEND_OPTIONS: object;
   CELERY_QUEUE: string;
   TASK_PROTOCOL: number;
+  TASK_PUBLISH_RETRY: boolean;
+  TASK_PUBLISH_RETRY_POLICY: object;
 }
 
 const DEFAULT_CELERY_CONF: CeleryConf = {
@@ -13,7 +15,14 @@ const DEFAULT_CELERY_CONF: CeleryConf = {
   CELERY_BACKEND: "amqp://",
   CELERY_BACKEND_OPTIONS: {},
   CELERY_QUEUE: "celery",
-  TASK_PROTOCOL: 2
+  TASK_PROTOCOL: 2,
+  TASK_PUBLISH_RETRY: false,
+  TASK_PUBLISH_RETRY_POLICY: {
+    maxRetries: 3,
+    intervalStart: 0,
+    intervalMax: 1,
+    intervalStep: 0.01,
+  },
 };
 
 function cloneObject(obj: object): object {

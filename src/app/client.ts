@@ -46,6 +46,22 @@ export default class Client extends Base {
     args?: Array<any>,
     kwargs?: object
   ): TaskMessage {
+    const retry = kwargs?.["retry"] || this.conf.TASK_PUBLISH_RETRY;
+    let retryPolicy = {};
+    if (retry) {
+      retryPolicy =
+        kwargs?.["retryPolicy"] || this.conf.TASK_PUBLISH_RETRY_POLICY;
+      for (const key in this.conf.TASK_PUBLISH_RETRY_POLICY) {
+        if (
+          this.conf.TASK_PUBLISH_RETRY_POLICY.hasOwnProperty(key) &&
+          this.conf.TASK_PUBLISH_RETRY_POLICY[key] !== 0
+        ) {
+          retryPolicy[key] = this.conf.TASK_PUBLISH_RETRY_POLICY[key];
+        }
+      }
+    }
+
+    retryPolicy;
     const message: TaskMessage = {
       headers: {
         lang: "js",
@@ -56,7 +72,6 @@ export default class Client extends Base {
         'eta': eta,
         'expires': expires,
         'group': group_id,
-        'retries': retries,
         'timelimit': [time_limit, soft_time_limit],
         'root_id': root_id,
         'parent_id': parent_id,
@@ -64,6 +79,7 @@ export default class Client extends Base {
         'kwargsrepr': kwargsrepr,
         'origin': origin or anon_nodename()
         */
+        retries: retry ? retryPolicy["maxRetries"] : 0,
       },
       properties: {
         correlationId: taskId,

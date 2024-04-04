@@ -42,7 +42,7 @@ export default class Worker extends Base {
   public start(): Promise<any> {
     console.info("celery.node worker starting...");
     console.info(`registered task: ${Object.keys(this.handlers)}`);
-    return this.run().catch(err => console.error(err));
+    return this.run().catch((err) => console.error(err));
   }
 
   /**
@@ -105,7 +105,7 @@ export default class Worker extends Base {
           callbacks: payload["callbacks"],
           errbacks: payload["errbacks"],
           chord: payload["chord"],
-          chain: null
+          chain: null,
         };
 
         body = [args, kwargs, embed];
@@ -123,13 +123,22 @@ export default class Worker extends Base {
           retries: payload["retries"] || 0,
           timelimit: payload["timelimit"] || [null, null],
           kwargsrepr: payload["kwargsrepr"],
-          origin: payload["origin"]
+          origin: payload["origin"],
         };
       }
 
       // request
       const [args, kwargs /*, embed */] = body;
       const taskId = headers["id"];
+      const retries = headers?.["retries"] || 0;
+      let retryPolicy = {};
+
+      for (const item of body) {
+        if (item && item.retryPolicy) {
+          retryPolicy = item.retryPolicy;
+          break;
+        }
+      }
 
       const handler = this.handlers[taskName];
       if (!handler) {
@@ -142,19 +151,68 @@ export default class Worker extends Base {
         )}`
       );
 
-      const timeStart = process.hrtime();
-      const taskPromise = handler(...args, kwargs).then(result => {
-        const diff = process.hrtime(timeStart);
-        console.info(
-          `celery.node Task ${taskName}[${taskId}] succeeded in ${diff[0] +
-            diff[1] / 1e9}s: ${result}`
+      const calculateTimeout = (retryPolicy, attempt) => {
+        const { intervalStart, intervalMax, intervalStep } = retryPolicy;
+
+        // Calculate the total number of intervals
+        const totalIntervals = Math.ceil(
+          (intervalMax - intervalStart) / intervalStep
         );
-        this.backend.storeResult(taskId, result, "SUCCESS");
+
+        // Calculate the total time spent on retries
+        const totalTimeRetries = totalIntervals * intervalStep;
+
+        // Calculate the total timeout including retries
+        const totalTimeout = totalTimeRetries * 1000 * (attempt + 1); // attempt + 1 to include initial attempt
+
+        return totalTimeout;
+      };
+
+      const timeStart = process.hrtime();
+      let retryCount = 0;
+
+      const executeTask = async () => {
+        try {
+          return await handler(...args, kwargs);
+        } catch (err) {
+          console.info(
+            `celery.node Task ${taskName}[${taskId}] failed: [${err}]`
+          );
+          this.activeTasks.delete(taskPromise);
+
+          if (retries && retryCount < retries) {
+            const delayTime = calculateTimeout(retryPolicy, retryCount) || 1000;
+            console.error(
+              `celery.node Task ${taskName}[${taskId}] Error processing task. Retrying ${delayTime}ms (Retry ${retryCount +
+                1}/${retries})`
+            );
+            retryCount++;
+            // Implementing a delay before retrying the task
+            await new Promise((resolve) => setTimeout(resolve, delayTime));
+            return executeTask(); // Retry the task
+          } else {
+            this.backend.storeResult(taskId, err, "FAILURE");
+            if (retries) {
+              console.error(
+                `celery.node Task ${taskName}[${taskId}] Maximum retries (${retries}) exceeded. ${err}.`
+              );
+            }
+            return null;
+          }
+        }
+      };
+
+      const taskPromise = executeTask().then((result) => {
+        if (result !== null) {
+          const diff = process.hrtime(timeStart);
+          console.info(
+            `celery.node Task ${taskName}[${taskId}] succeeded in ${diff[0] +
+              diff[1] / 1e9}s: ${result}`
+          );
+          this.backend.storeResult(taskId, result, "SUCCESS");
+        }
         this.activeTasks.delete(taskPromise);
-      }).catch(err => {
-        console.info(`celery.node Task ${taskName}[${taskId}] failed: [${err}]`);
-        this.backend.storeResult(taskId, err, "FAILURE");
-        this.activeTasks.delete(taskPromise);
+        return result;
       });
 
       // record the executing task

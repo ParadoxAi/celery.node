@@ -2,3 +2,5 @@ node_modules
 .vscode
 dist
 __pycache__
+yarn.lock
+yarn-error.log

@@ -4,7 +4,8 @@ services:
   rabbit:
     image: rabbitmq
     ports:
-      - "5672:5672"
+      - "5675:5672"
+      - "15675:15672"
   redis:
     image: redis
     ports:
