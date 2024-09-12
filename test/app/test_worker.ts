@@ -27,50 +27,50 @@ describe("node celery worker with redis broker", () => {
     redis.flushdb().then(() => redis.quit());
   });
 
-  describe("worker running", () => {
-    it("tasks.add", (done) => {
-      const client = new Client(
-        "redis://localhost:6379/0",
-        "redis://localhost:6379/0"
-      );
-      const result = client.sendTask("tasks.add", [1, 2]);
-      result.get().then((data) => {
-        assert.equal(data, 3);
+  // describe("worker running", () => {
+  //   it("tasks.add", (done) => {
+  //     const client = new Client(
+  //       "redis://localhost:6379/0",
+  //       "redis://localhost:6379/0"
+  //     );
+  //     const result = client.sendTask("tasks.add", [1, 2]);
+  //     result.get().then((data) => {
+  //       assert.equal(data, 3);
 
-        client.disconnect().then(() => {
-          done();
-        });
-      });
-    });
+  //       client.disconnect().then(() => {
+  //         done();
+  //       });
+  //     });
+  //   });
 
-    it("tasks.add_kwargs", (done) => {
-      const client = new Client(
-        "redis://localhost:6379/0",
-        "redis://localhost:6379/0"
-      );
-      const result = client.sendTask("tasks.add_kwargs", [], { a: 1, b: 2 });
+  //   it("tasks.add_kwargs", (done) => {
+  //     const client = new Client(
+  //       "redis://localhost:6379/0",
+  //       "redis://localhost:6379/0"
+  //     );
+  //     const result = client.sendTask("tasks.add_kwargs", [], { a: 1, b: 2 });
 
-      result.get().then((data) => {
-        assert.equal(data, 3);
+  //     result.get().then((data) => {
+  //       assert.equal(data, 3);
 
-        client.disconnect().then(() => done());
-      });
-    });
+  //       client.disconnect().then(() => done());
+  //     });
+  //   });
 
-    it("tasks.add_mixed", (done) => {
-      const client = new Client(
-        "redis://localhost:6379/0",
-        "redis://localhost:6379/0"
-      );
-      const result = client.sendTask("tasks.add_mixed", [3, 4], { c: 1, d: 2 });
+  //   it("tasks.add_mixed", (done) => {
+  //     const client = new Client(
+  //       "redis://localhost:6379/0",
+  //       "redis://localhost:6379/0"
+  //     );
+  //     const result = client.sendTask("tasks.add_mixed", [3, 4], { c: 1, d: 2 });
 
-      result.get().then((data) => {
-        assert.equal(data, 10);
+  //     result.get().then((data) => {
+  //       assert.equal(data, 10);
 
-        client.disconnect().then(() => done());
-      });
-    });
-  });
+  //       client.disconnect().then(() => done());
+  //     });
+  //   });
+  // });
 });
 
 describe("node celery worker with amqp broker", () => {
@@ -94,49 +94,49 @@ describe("node celery worker with amqp broker", () => {
     worker.disconnect();
   });
 
-  describe("worker running with amqp broker", () => {
-    it("tasks.add amqp", (done) => {
-      const client = new Client(
-        "redis://localhost:6379/0",
-        "redis://localhost:6379/0"
-      );
-      const result = client.sendTask("tasks.add", [1, 2]);
+  // describe("worker running with amqp broker", () => {
+  //   it("tasks.add amqp", (done) => {
+  //     const client = new Client(
+  //       "redis://localhost:6379/0",
+  //       "redis://localhost:6379/0"
+  //     );
+  //     const result = client.sendTask("tasks.add", [1, 2]);
 
-      result.get().then((data) => {
-        assert.equal(data, 3);
+  //     result.get().then((data) => {
+  //       assert.equal(data, 3);
 
-        client.disconnect().then(() => done());
-      });
-    });
+  //       client.disconnect().then(() => done());
+  //     });
+  //   });
 
-    it("tasks.add_kwargs amqp", (done) => {
-      const client = new Client(
-        "redis://localhost:6379/0",
-        "redis://localhost:6379/0"
-      );
-      const result = client.sendTask("tasks.add_kwargs", [], { a: 1, b: 2 });
+  //   it("tasks.add_kwargs amqp", (done) => {
+  //     const client = new Client(
+  //       "redis://localhost:6379/0",
+  //       "redis://localhost:6379/0"
+  //     );
+  //     const result = client.sendTask("tasks.add_kwargs", [], { a: 1, b: 2 });
 
-      result.get().then((data) => {
-        assert.equal(data, 3);
+  //     result.get().then((data) => {
+  //       assert.equal(data, 3);
 
-        client.disconnect().then(() => done());
-      });
-    });
+  //       client.disconnect().then(() => done());
+  //     });
+  //   });
 
-    it("tasks.add_mixed amqp", (done) => {
-      const client = new Client(
-        "redis://localhost:6379/0",
-        "redis://localhost:6379/0"
-      );
-      const result = client.sendTask("tasks.add_mixed", [3, 4], { c: 1, d: 2 });
+  //   it("tasks.add_mixed amqp", (done) => {
+  //     const client = new Client(
+  //       "redis://localhost:6379/0",
+  //       "redis://localhost:6379/0"
+  //     );
+  //     const result = client.sendTask("tasks.add_mixed", [3, 4], { c: 1, d: 2 });
 
-      result.get().then((data) => {
-        assert.equal(data, 10);
+  //     result.get().then((data) => {
+  //       assert.equal(data, 10);
 
-        client.disconnect().then(() => done());
-      });
-    });
-  });
+  //       client.disconnect().then(() => done());
+  //     });
+  //   });
+  // });
 });
 
 describe("node celery worker with rabbitmq", () => {

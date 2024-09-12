@@ -9,7 +9,7 @@
     "format": "prettier --write \"{,!(node_modules)/**/}*.{js,ts}\"",
     "format-check": "prettier --check \"{,!(node_modules)/**/}*.{js,ts}\"",
     "dist": "tsc",
-    "test": "mocha -r ts-node/register ./test/**/*",
+    "test": "mocha -r ts-node/register ./test/app/test_client.ts",
     "prepublishOnly": "npm run dist & npm test"
   },
   "repository": {

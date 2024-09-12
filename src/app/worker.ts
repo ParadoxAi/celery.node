@@ -174,10 +174,6 @@ export default class Worker extends Base {
 
       const executeTask = async () => {
         try {
-          console.log("executeTask", executeTask);
-          console.log("args", args);
-          console.log("kwargs", kwargs);
-
           return await handler(...args, kwargs);
         } catch (err) {
           console.info(
@@ -209,7 +205,6 @@ export default class Worker extends Base {
       };
 
       taskPromise = executeTask().then((result) => {
-        console.log("result", result);
         if (result !== null) {
           const diff = process.hrtime(timeStart);
           console.info(
