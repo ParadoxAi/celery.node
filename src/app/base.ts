@@ -37,10 +37,10 @@ export default class Base {
 
   get backend(): CeleryBackend {
     if (!this._backend) {
-      this._backend = newCeleryBackend(
-        this.conf.CELERY_BACKEND,
-        this.conf.CELERY_BACKEND_OPTIONS
-      );
+      // this._backend = newCeleryBackend(
+      //   this.conf.CELERY_BACKEND,
+      //   this.conf.CELERY_BACKEND_OPTIONS
+      // );
     }
 
     return this._backend;
@@ -53,7 +53,7 @@ export default class Base {
    * @returns {Promise} promise that continues if backend and broker connected.
    */
   public isReady(): Promise<any> {
-    return Promise.all([this.backend.isReady(), this.broker.isReady()]);
+    return Promise.all([this.backend?.isReady(), this.broker.isReady()]);
   }
 
   /**
@@ -63,6 +63,6 @@ export default class Base {
    * @returns {Promise} promises that continues if backend and broker disconnected.
    */
   public disconnect(): Promise<any> {
-    return this.broker.disconnect().then(() => this.backend.disconnect());
+    return this.broker.disconnect().then(() => this.backend?.disconnect());
   }
 }

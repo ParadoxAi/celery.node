@@ -170,9 +170,14 @@ export default class Worker extends Base {
 
       const timeStart = process.hrtime();
       let retryCount = 0;
+      let taskPromise: Promise<any>;
 
       const executeTask = async () => {
         try {
+          console.log("executeTask", executeTask);
+          console.log("args", args);
+          console.log("kwargs", kwargs);
+
           return await handler(...args, kwargs);
         } catch (err) {
           console.info(
@@ -189,9 +194,10 @@ export default class Worker extends Base {
             retryCount++;
             // Implementing a delay before retrying the task
             await new Promise((resolve) => setTimeout(resolve, delayTime));
+
             return executeTask(); // Retry the task
           } else {
-            this.backend.storeResult(taskId, err, "FAILURE");
+            this.backend?.storeResult(taskId, err, "FAILURE");
             if (retries) {
               console.error(
                 `celery.node Task ${taskName}[${taskId}] Maximum retries (${retries}) exceeded. ${err}.`
@@ -202,19 +208,22 @@ export default class Worker extends Base {
         }
       };
 
-      const taskPromise = executeTask().then((result) => {
+      taskPromise = executeTask().then((result) => {
+        console.log("result", result);
         if (result !== null) {
           const diff = process.hrtime(timeStart);
           console.info(
             `celery.node Task ${taskName}[${taskId}] succeeded in ${diff[0] +
               diff[1] / 1e9}s: ${result}`
           );
-          this.backend.storeResult(taskId, result, "SUCCESS");
+          this.backend?.storeResult(taskId, result, "SUCCESS");
         }
         this.activeTasks.delete(taskPromise);
+
         return result;
       });
 
+      console.log(taskPromise);
       // record the executing task
       this.activeTasks.add(taskPromise);
 

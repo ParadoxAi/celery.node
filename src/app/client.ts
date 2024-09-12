@@ -145,6 +145,7 @@ export default class Client extends Base {
    * @returns {AsyncResult}
    */
   public asyncResult(taskId: string): AsyncResult {
+    console.log("taskId", taskId);
     return new AsyncResult(taskId, this.backend);
   }
 

@@ -147,7 +147,7 @@ export default class AMQPBroker implements CeleryBroker {
               `unsupported content encoding ${rawMsg.properties.contentEncoding}`
             );
           }
-
+          console.log("rawMsg", rawMsg);
           callback(new AMQPMessage(rawMsg));
         })
       );
