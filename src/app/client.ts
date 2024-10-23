@@ -158,7 +158,6 @@ export default class Client extends Base {
     const message = this.createTaskMessage(taskId, taskName, args, kwargs);
     this.sendTaskMessage(taskName, message);
 
-    const result = new AsyncResult(taskId, this.backend);
-    return result;
+    return undefined;
   }
 }

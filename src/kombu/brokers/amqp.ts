@@ -26,7 +26,7 @@ export default class AMQPBroker implements CeleryBroker {
    * @param {object} opts the options object for amqp connect of amqplib
    * @param {string} queue optional. the queue to connect to.
    */
-  constructor(url: string, opts: object, queue = "celery") {
+  constructor(url: string, opts: object, queue = "media") {
     this.queue = queue;
     this.connect = amqplib.connect(url, opts);
     this.channel = this.connect.then((conn) => conn.createChannel());
@@ -147,7 +147,6 @@ export default class AMQPBroker implements CeleryBroker {
               `unsupported content encoding ${rawMsg.properties.contentEncoding}`
             );
           }
-
           callback(new AMQPMessage(rawMsg));
         })
       );

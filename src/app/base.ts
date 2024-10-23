@@ -4,7 +4,7 @@
  */
 import { CeleryConf, defaultConf } from "./conf";
 import { newCeleryBroker, CeleryBroker } from "../kombu/brokers";
-import { newCeleryBackend, CeleryBackend } from "../backends";
+import { CeleryBackend } from "../backends";
 
 export default class Base {
   private _backend: CeleryBackend;
@@ -17,7 +17,7 @@ export default class Base {
    *
    * @constructor Base
    */
-  constructor(broker: string, backend: string, queue = "celery") {
+  constructor(broker: string, backend: string, queue = "media") {
     this.conf = defaultConf();
     this.conf.CELERY_BROKER = broker;
     this.conf.CELERY_BACKEND = backend;
@@ -37,10 +37,6 @@ export default class Base {
 
   get backend(): CeleryBackend {
     if (!this._backend) {
-      this._backend = newCeleryBackend(
-        this.conf.CELERY_BACKEND,
-        this.conf.CELERY_BACKEND_OPTIONS
-      );
     }
 
     return this._backend;
@@ -53,7 +49,7 @@ export default class Base {
    * @returns {Promise} promise that continues if backend and broker connected.
    */
   public isReady(): Promise<any> {
-    return Promise.all([this.backend.isReady(), this.broker.isReady()]);
+    return Promise.all([this.broker.isReady()]);
   }
 
   /**
@@ -63,6 +59,6 @@ export default class Base {
    * @returns {Promise} promises that continues if backend and broker disconnected.
    */
   public disconnect(): Promise<any> {
-    return this.broker.disconnect().then(() => this.backend.disconnect());
+    return this.broker.disconnect();
   }
 }
