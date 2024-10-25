@@ -136,13 +136,13 @@ export default class Worker extends Base {
           origin: payload["origin"],
         };
       }
-
+      console.log("body=-=======", body);
       // request
       const [args, kwargs /*, embed */] = body;
       const taskId = headers["id"];
       const retries = headers?.["retries"] || 0;
       let retryPolicy = {};
-
+      console.log("retries===========", retries);
       for (const item of body) {
         if (item && item.retryPolicy) {
           retryPolicy = item.retryPolicy;

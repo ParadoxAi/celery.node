@@ -47,6 +47,8 @@ export default class Client extends Base {
     kwargs?: object
   ): TaskMessage {
     const retry = kwargs?.["retry"] || this.conf.TASK_PUBLISH_RETRY;
+    console.log("787897897", JSON.stringify(args, null, 2)); // Pretty-print with 2-space indentation
+    console.log("kwargs", kwargs);
     let retryPolicy = {};
     if (retry) {
       retryPolicy =
