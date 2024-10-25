@@ -136,7 +136,7 @@ export default class Worker extends Base {
           origin: payload["origin"],
         };
       }
-      console.log("body=-=======", body);
+      // console.log("body=-=======", body);
       // request
       const [args, kwargs /*, embed */] = body;
       const taskId = headers["id"];
