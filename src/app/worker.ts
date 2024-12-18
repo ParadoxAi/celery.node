@@ -4,6 +4,7 @@ import { Message } from "../kombu/message";
 export default class Worker extends Base {
   handlers: object = {};
   activeTasks: Set<Promise<any>> = new Set();
+  onFailed: ((messageOnFailed) => void) | null = null;
 
   /**
    * Register task handler on worker handlers
@@ -30,6 +31,15 @@ export default class Worker extends Base {
         return Promise.reject(err);
       }
     };
+  }
+
+  /**
+   * Set the callback to be invoked when a task fails
+   * @method Worker#setOnFailed
+   * @param {Function} callback the callback function to be called on failure
+   */
+  public setOnFailed(callback: (messageOnFailed: any) => void): void {
+    this.onFailed = callback;
   }
 
   /**
@@ -126,13 +136,13 @@ export default class Worker extends Base {
           origin: payload["origin"],
         };
       }
-
+      // console.log("body=-=======", body);
       // request
       const [args, kwargs /*, embed */] = body;
       const taskId = headers["id"];
       const retries = headers?.["retries"] || 0;
       let retryPolicy = {};
-
+      // console.log("retries===========", retries);
       for (const item of body) {
         if (item && item.retryPolicy) {
           retryPolicy = item.retryPolicy;
@@ -170,6 +180,7 @@ export default class Worker extends Base {
 
       const timeStart = process.hrtime();
       let retryCount = 0;
+      let taskPromise: Promise<any>;
 
       const executeTask = async () => {
         try {
@@ -191,25 +202,35 @@ export default class Worker extends Base {
             await new Promise((resolve) => setTimeout(resolve, delayTime));
             return executeTask(); // Retry the task
           } else {
-            this.backend.storeResult(taskId, err, "FAILURE");
             if (retries) {
               console.error(
                 `celery.node Task ${taskName}[${taskId}] Maximum retries (${retries}) exceeded. ${err}.`
               );
+            }
+            if (this?.onFailed) {
+              console.error("taskId", taskId);
+              const messageOnFailed = {
+                body,
+                taskName: taskName,
+                taskId: taskId,
+                message: message,
+                error: err,
+              };
+
+              this.onFailed(messageOnFailed);
             }
             return null;
           }
         }
       };
 
-      const taskPromise = executeTask().then((result) => {
+      taskPromise = executeTask().then((result) => {
         if (result !== null) {
           const diff = process.hrtime(timeStart);
           console.info(
             `celery.node Task ${taskName}[${taskId}] succeeded in ${diff[0] +
               diff[1] / 1e9}s: ${result}`
           );
-          this.backend.storeResult(taskId, result, "SUCCESS");
         }
         this.activeTasks.delete(taskPromise);
         return result;

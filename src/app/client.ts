@@ -47,6 +47,8 @@ export default class Client extends Base {
     kwargs?: object
   ): TaskMessage {
     const retry = kwargs?.["retry"] || this.conf.TASK_PUBLISH_RETRY;
+    // console.log("787897897", JSON.stringify(args, null, 2)); // Pretty-print with 2-space indentation
+    // console.log("kwargs", kwargs);
     let retryPolicy = {};
     if (retry) {
       retryPolicy =
@@ -158,7 +160,6 @@ export default class Client extends Base {
     const message = this.createTaskMessage(taskId, taskName, args, kwargs);
     this.sendTaskMessage(taskName, message);
 
-    const result = new AsyncResult(taskId, this.backend);
-    return result;
+    return undefined;
   }
 }

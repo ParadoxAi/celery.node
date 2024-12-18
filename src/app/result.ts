@@ -28,7 +28,7 @@ export class AsyncResult {
    * @param {string} taskId task id
    * @param {CeleryBackend} backend celery backend instance
    */
-  constructor(taskId: string, backend: CeleryBackend) {
+  constructor(taskId: string, backend?: CeleryBackend) {
     this.taskId = taskId;
     this.backend = backend;
     this._cache = null;
@@ -51,15 +51,7 @@ export class AsyncResult {
       }
 
       intervalId = setInterval(() => {
-        this.backend.getTaskMeta(this.taskId).then(meta => {
-          if (meta && isFinalStatus[meta["status"]]) {
-            if (timeout) {
-              clearTimeout(timeoutId);
-            }
-            clearInterval(intervalId);
-            resolve(meta);
-          }
-        });
+        resolve(undefined);
       }, interval);
     };
 
@@ -77,11 +69,17 @@ export class AsyncResult {
           }
         });
       });
-      
+
       this._cache = p;
     }
 
     return this._cache.then((meta) => {
+      if (!this.backend) {
+        return undefined; // Return undefined if meta is undefined
+      }
+      if (!meta) {
+        return undefined; // Return undefined if meta is undefined
+      }
       if (isErrorStatus[meta["status"]]) {
         throw createError(meta["status"], meta["result"]);
       } else {
@@ -93,19 +91,15 @@ export class AsyncResult {
   private getTaskMeta(): Promise<object> {
     if (!this._cache) {
       this._cache = new Promise<object>((resolve) => {
-        this.backend.getTaskMeta(this.taskId)
-          .then(resolve);
+        this.backend?.getTaskMeta(this.taskId).then(resolve);
       });
     } else {
       const p = new Promise<object>((resolve) => {
-        this._cache.then(meta => {
-            if (meta && isFinalStatus[meta["status"]]) {
-              resolve(meta);
-            } else {
-              this.backend.getTaskMeta(this.taskId)
-                .then(resolve);
-            }
-          })
+        this._cache.then((meta) => {
+          if (meta && isFinalStatus[meta["status"]]) {
+            resolve(meta);
+          }
+        });
       });
       this._cache = p;
     }
@@ -114,24 +108,22 @@ export class AsyncResult {
   }
 
   public result(): Promise<any> {
-    return this.getTaskMeta()
-      .then((meta) => {
-        if (meta) {
-          return meta["result"];
-        } else {
-          return null;
-        }
-      });
+    return this.getTaskMeta().then((meta) => {
+      if (meta) {
+        return meta["result"];
+      } else {
+        return null;
+      }
+    });
   }
 
   public status(): Promise<string> {
-    return this.getTaskMeta()
-      .then((meta) => {
-        if (meta) {
-          return meta["status"];
-        } else {
-          return null;
-        }
-      });
+    return this.getTaskMeta().then((meta) => {
+      if (meta) {
+        return meta["status"];
+      } else {
+        return null;
+      }
+    });
   }
 }

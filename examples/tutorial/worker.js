@@ -1,17 +1,54 @@
 "use strict";
 const celery = require("../../dist");
 
-const worker = celery.createWorker(
-  "amqp://myuser:mypassword@localhost:5672",
-  "amqp://myuser:mypassword@localhost:5672"
-);
-worker.register("tasks.error", (a, b) => {
+const worker = celery.createWorker("amqp://myuser:mypassword@localhost:5672");
+
+worker.setOnFailed((messageOnFailed) => {
+  console.log("setOnFailed");
+  console.log("setOnFailed - taskName222", messageOnFailed.taskName);
+  console.log("setOnFailed - taskId22", messageOnFailed.taskId);
+  console.log("setOnFailed - body222", messageOnFailed.body);
+  console.log("setOnFailed - err222", messageOnFailed.error);
+});
+worker.register("tasks.error", (a) => {
+  try {
+    const c = {};
+    console.log("a", a);
+    if (a === 2) {
+      c["a"]["b"];
+    }
+    return a + 1;
+  } catch (error) {
+    console.log("error", error);
+  }
+});
+
+worker.register("tasks.error2", (a) => {
   const c = {};
-  c["a"]["b"];
-  return a + b;
+  console.log("a", a);
+  if (a["13"] == "34") {
+    c["a"]["b"];
+  }
+  return a + 1;
 });
 
 worker.register("tasks.add", (a, b) => {
+  if (a === 2) {
+    c["a"]["b"];
+  }
   return a + b;
 });
-worker.start();
+async function runWorker() {
+  try {
+    const success = await worker.start();
+    if (success) {
+      console.log("Worker started successfully.");
+    } else {
+      console.log("Worker failed to start.");
+    }
+  } catch (error) {
+    console.error("Unexpected error:", error);
+  }
+}
+
+runWorker();
