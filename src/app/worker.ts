@@ -155,12 +155,6 @@ export default class Worker extends Base {
         throw new Error(`Missing process handler for task ${taskName}`);
       }
 
-      console.info(
-        `celery.node Received task: ${taskName}[${taskId}], args: ${args}, kwargs: ${JSON.stringify(
-          kwargs
-        )}`
-      );
-
       const calculateTimeout = (retryPolicy, attempt) => {
         const { intervalStart, intervalMax, intervalStep } = retryPolicy;
 
@@ -178,7 +172,6 @@ export default class Worker extends Base {
         return totalTimeout;
       };
 
-      const timeStart = process.hrtime();
       let retryCount = 0;
       let taskPromise: Promise<any>;
 
@@ -186,29 +179,17 @@ export default class Worker extends Base {
         try {
           return await handler(...args, kwargs);
         } catch (err) {
-          console.info(
-            `celery.node Task ${taskName}[${taskId}] failed: [${err}]`
-          );
           this.activeTasks.delete(taskPromise);
 
           if (retries && retryCount < retries) {
             const delayTime = calculateTimeout(retryPolicy, retryCount) || 1000;
-            console.error(
-              `celery.node Task ${taskName}[${taskId}] Error processing task. Retrying ${delayTime}ms (Retry ${retryCount +
-                1}/${retries})`
-            );
+
             retryCount++;
             // Implementing a delay before retrying the task
             await new Promise((resolve) => setTimeout(resolve, delayTime));
             return executeTask(); // Retry the task
           } else {
-            if (retries) {
-              console.error(
-                `celery.node Task ${taskName}[${taskId}] Maximum retries (${retries}) exceeded. ${err}.`
-              );
-            }
             if (this?.onFailed) {
-              console.error("taskId", taskId);
               const messageOnFailed = {
                 body,
                 taskName: taskName,
@@ -225,13 +206,6 @@ export default class Worker extends Base {
       };
 
       taskPromise = executeTask().then((result) => {
-        if (result !== null) {
-          const diff = process.hrtime(timeStart);
-          console.info(
-            `celery.node Task ${taskName}[${taskId}] succeeded in ${diff[0] +
-              diff[1] / 1e9}s: ${result}`
-          );
-        }
         this.activeTasks.delete(taskPromise);
         return result;
       });
@@ -262,5 +236,15 @@ export default class Worker extends Base {
   // eslint-disable-next-line class-methods-use-this
   public stop(): any {
     throw new Error("not implemented yet");
+  }
+
+  public sanitizeJSON(data: any) {
+    return JSON.stringify(data, (key, value) => {
+      return key === "jwtToken" || key === "jwt_token" ? "****" : value;
+    });
+  }
+
+  public sanitizeObject(data: any) {
+    return JSON.parse(this.sanitizeJSON(data));
   }
 }

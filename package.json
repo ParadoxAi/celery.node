@@ -1,6 +1,6 @@
 {
   "name": "@prd-thanhnguyenhoang/celery.node",
-  "version": "1.0.23",
+  "version": "1.0.35",
   "description": "celery written in nodejs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -63,10 +63,15 @@
   },
   "dependencies": {
     "@types/node": "^20.11.30",
+    "@types/winston": "^2.4.4",
+    "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.8.0",
     "axios": "^1.7.7",
+    "datadog-winston": "^1.6.0",
+    "install": "^0.13.0",
     "ioredis": "^4.28.5",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "winston": "^3.17.0"
   },
   "directories": {
     "example": "examples",
