@@ -1,6 +1,6 @@
 import Client from "./app/client";
 import Worker from "./app/worker";
-
+import { CeleryConf, defaultConf } from "./app/conf";
 /**
  * @description Basic function for creating celery client
  *
@@ -10,9 +10,10 @@ import Worker from "./app/worker";
 export function createClient(
   broker = "amqp://",
   backend = "amqp://",
-  queue = "media"
+  queue = "media",
+  conf: CeleryConf = defaultConf()
 ): Client {
-  return new Client(broker, backend, queue);
+  return new Client(broker, backend, queue, conf);
 }
 
 /**
@@ -24,7 +25,8 @@ export function createClient(
 export function createWorker(
   broker = "amqp://",
   backend = "amqp://",
-  queue = "media"
+  queue = "media",
+  conf: CeleryConf = defaultConf()
 ): Worker {
-  return new Worker(broker, backend, queue);
+  return new Worker(broker, backend, queue, conf);
 }

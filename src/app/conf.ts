@@ -11,7 +11,10 @@ export interface CeleryConf {
 
 const DEFAULT_CELERY_CONF: CeleryConf = {
   CELERY_BROKER: "amqp://",
-  CELERY_BROKER_OPTIONS: {},
+  CELERY_BROKER_OPTIONS: {
+    maxRetries: 300,
+    initialRetryDelay: 1000, // 60 seconds = 1 minute
+  },
   CELERY_BACKEND: "amqp://",
   CELERY_BACKEND_OPTIONS: {},
   CELERY_QUEUE: "media",

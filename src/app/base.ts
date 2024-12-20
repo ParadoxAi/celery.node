@@ -17,8 +17,13 @@ export default class Base {
    *
    * @constructor Base
    */
-  constructor(broker: string, backend: string, queue = "media") {
-    this.conf = defaultConf();
+  constructor(
+    broker: string,
+    backend: string = null,
+    queue = "media",
+    conf: CeleryConf = defaultConf()
+  ) {
+    this.conf = conf;
     this.conf.CELERY_BROKER = broker;
     this.conf.CELERY_BACKEND = backend;
     this.conf.CELERY_QUEUE = queue;
@@ -49,7 +54,11 @@ export default class Base {
    * @returns {Promise} promise that continues if backend and broker connected.
    */
   public isReady(): Promise<any> {
-    return Promise.all([this.broker.isReady()]);
+    try {
+      return Promise.all([this.broker.isReady()]);
+    } catch (error) {
+      console.log("error", error);
+    }
   }
 
   /**
