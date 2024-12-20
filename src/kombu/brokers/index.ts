@@ -51,11 +51,11 @@ export function newCeleryBroker(
   CELERY_QUEUE = "celery"
 ): CeleryBroker {
   const brokerProtocol = getProtocol(CELERY_BROKER);
-  if (['redis', 'rediss'].indexOf(brokerProtocol) > -1) {
+  if (["redis", "rediss"].indexOf(brokerProtocol) > -1) {
     return new RedisBroker(CELERY_BROKER, CELERY_BROKER_OPTIONS);
   }
 
-  if (['amqp', 'amqps'].indexOf(brokerProtocol) > -1) {
+  if (["amqp", "amqps"].indexOf(brokerProtocol) > -1) {
     return new AMQPBroker(CELERY_BROKER, CELERY_BROKER_OPTIONS, CELERY_QUEUE);
   }
 

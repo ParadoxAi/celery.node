@@ -1,7 +1,18 @@
 "use strict";
 const celery = require("../../dist");
-
-const worker = celery.createWorker("amqp://myuser:mypassword@localhost:5672");
+const conf = {
+  CELERY_QUEUE: "media2222",
+  CELERY_BROKER_OPTIONS: {
+    maxRetries: 300,
+    initialRetryDelay: 1000, // 60 seconds = 1 minute
+  },
+};
+const worker = celery.createWorker(
+  "amqp://myuser:mypassword@localhost:5672",
+  null,
+  conf.CELERY_QUEUE,
+  conf
+);
 
 worker.setOnFailed((messageOnFailed) => {
   console.log("setOnFailed");
