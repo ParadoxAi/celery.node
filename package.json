@@ -66,7 +66,7 @@
     "@types/winston": "^2.4.4",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.8",
-    "axios": "^1.10.0",
+    "axios": "^1.8.2",
     "datadog-winston": "^1.6.0",
     "install": "^0.13.0",
     "ioredis": "^5.6.1",
