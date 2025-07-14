@@ -64,6 +64,7 @@ try {
     },
     message.requestId
   );
+  console.log("Task sent successfully", result);
   result.get().then((value) => {
     console.log(value); // Output: Promise resolved with a value
     client.disconnect();

@@ -1,16 +1,16 @@
 {
+  "baseUrl": ".",
   "compilerOptions": {
-      "outDir": "./dist",
-      "allowJs": true,
-      "target": "es6",
-      "lib": ["ES6"],
-      "moduleResolution": "node",
-      "noEmitOnError": true,
-      "typeRoots": ["./node_modules/@types"],
-      "declaration": true,
-      "module": "CommonJS"
+    "outDir": "./dist",
+    "allowJs": true,
+    "target": "es6",
+    "lib": ["ES6"],
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "types": ["mocha", "node"],
+    "typeRoots": ["./node_modules/@types"],
+    "declaration": true,
+    "module": "CommonJS"
   },
-  "include": [
-      "./src/**/*"
-  ]
+  "include": ["./src/**/*", "./test/**/*"]
 }

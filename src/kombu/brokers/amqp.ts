@@ -15,7 +15,7 @@ class AMQPMessage extends Message {
 }
 
 export default class AMQPBroker implements CeleryBroker {
-  connect: Promise<amqplib.Connection>;
+  connect: Promise<amqplib.Connection> | any;
   channel: Promise<amqplib.Channel>;
   queue: string;
   private maxRetries: number;
@@ -42,7 +42,7 @@ export default class AMQPBroker implements CeleryBroker {
     this.retryDelay = retryDelay;
     // this.isReconnecting = false;
     this.connect = this.initConnection(url, opts);
-    this.channel = this.connect.then((conn) => conn.createChannel());
+    this.channel = this.connect.then((conn) => (conn as any).createChannel());
   }
 
   /**
@@ -56,8 +56,9 @@ export default class AMQPBroker implements CeleryBroker {
     while (retries < this.maxRetries) {
       try {
         console.log(
-          `[${new Date().toISOString()}] Attempting to connect to RabbitMQ (Attempt ${retries +
-            1}/${this.maxRetries})`
+          `[${new Date().toISOString()}] Attempting to connect to RabbitMQ (Attempt ${
+            retries + 1
+          }/${this.maxRetries})`
         );
         const connection = await amqplib.connect(url, opts);
         console.log(
@@ -90,7 +91,7 @@ export default class AMQPBroker implements CeleryBroker {
   public async initConnection(
     url: string,
     opts: object
-  ): Promise<amqplib.Connection> {
+  ): Promise<amqplib.Connection | any> {
     const connection = await amqplib.connect(url, opts);
 
     connection.on("error", (err) => {

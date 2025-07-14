@@ -3,7 +3,7 @@ import { CeleryBackend } from ".";
 
 export default class AMQPBackend implements CeleryBackend {
   opts: { [key: string]: any };
-  connect: Promise<amqplib.Connection>;
+  connect: Promise<any>; // Use more generic type to accommodate the actual return type
   channel: Promise<amqplib.Channel>;
 
   /**

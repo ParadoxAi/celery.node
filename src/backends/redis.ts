@@ -23,7 +23,7 @@ export default class RedisBackend implements CeleryBackend {
    * @param {object} opts the options object for redis connect of ioredis
    */
   constructor(url: string, opts: object) {
-    this.redis = new Redis(url, {...opts});
+    this.redis = new Redis.Redis(url, {...opts});
   }
 
   /**
